@@ -6,4 +6,4 @@ The current milestone includes issue reporting, tracking, filtering, assignment,
 2. Run `cd server && npm install && npm run dev`.
 3. Run `cd client && npm install && npm run dev` in a second terminal.
 
-Open `http://localhost:5173`. API: `GET /api/issues`, `POST /api/issues` (multipart form; image optional), and `PATCH /api/issues/:id`.
+Open `http://localhost:5173`. The local API runs on port 3000: `GET /api/issues`, `POST /api/issues` (multipart form; image optional), and `PATCH /api/issues/:id`.
