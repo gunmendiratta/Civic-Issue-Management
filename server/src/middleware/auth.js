@@ -6,5 +6,7 @@ export function requireAuth(req, res, next) {
   try { req.auth = jwt.verify(token, process.env.JWT_SECRET); next() } catch { return res.status(401).json({ message: 'Your session is invalid or has expired.' }) }
 }
 
-export const allowRoles = (...roles) => (req, res, next) => roles.includes(req.auth?.role)
-  ? next() : res.status(403).json({ message: 'You are not allowed to perform this action.' })
+export const allowRoles = (...roles) => (req, res, next) => {
+  if (roles.includes(req.auth?.role)) return next()
+  return res.status(403).json({ message: 'You are not allowed to perform this action.' })
+}
