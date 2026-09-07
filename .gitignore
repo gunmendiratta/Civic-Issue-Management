@@ -15,3 +15,4 @@ ai-service/models/*.pt
 ai-service/models/*.pth
 ai-service/models/*.onnx
 .DS_Store
+ai-service/.env
