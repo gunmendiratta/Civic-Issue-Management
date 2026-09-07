@@ -10,7 +10,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
-const app = express(); const origins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',')
+const app = express(); const origins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean)
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } })); app.use(cors({ origin: origins, credentials: false })); app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false })); app.use(express.json({ limit: '1mb' })); app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'civicconnect-api' })); app.use('/api/auth', authRoutes); app.use('/api/issues', issueRoutes); app.use('/api', dashboardRoutes); app.use('/api', adminRoutes); app.use(notFound); app.use(errorHandler)
 export default app

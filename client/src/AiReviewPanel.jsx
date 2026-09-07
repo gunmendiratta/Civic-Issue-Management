@@ -1,12 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import { Check, Save, Sparkles } from 'lucide-react'
-import axios from 'axios'
 import './ai-review.css'
+import { request } from './api.js'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-const api = axios.create({ baseURL: API_URL })
-const request = (config) => api({ ...config, headers: { ...config.headers, ...(localStorage.getItem('civicconnect-token') ? { Authorization: `Bearer ${localStorage.getItem('civicconnect-token')}` } : {}) } })
 const categories = ['Pothole', 'Garbage / Waste', 'Broken Streetlight', 'Water Leakage', 'Road Damage', 'Drainage Issue', 'Fallen Tree', 'Traffic Signal Damage', 'Illegal Dumping', 'Public Infrastructure Damage', 'Other']
 const severities = ['Low', 'Medium', 'High', 'Critical']
 

@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars, react-hooks/exhaustive-deps, react-hooks/set-state-in-effect */
 import { createContext, useContext, useEffect, useState } from 'react'
 import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
 import { Bell, Building2, Eye, EyeOff, LogOut, MapPin, Plus, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { Bar, BarChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
@@ -10,11 +9,11 @@ import './App.css'
 import './enhancements.css'
 import AiReviewPanel from './AiReviewPanel.jsx'
 import ReportPage from './ReportPage.jsx'
+import { API_URL, api, imageUrl, request } from './api.js'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'; const api = axios.create({ baseURL: API_URL }); const Auth = createContext(null); const imageUrl = (url) => /^https?:\/\//.test(url) ? url : `${API_URL.replace('/api', '')}${url}`
+const Auth = createContext(null)
 const categories = ['Pothole', 'Garbage / Waste', 'Broken Streetlight', 'Water Leakage', 'Road Damage', 'Drainage Issue', 'Fallen Tree', 'Traffic Signal Damage', 'Illegal Dumping', 'Public Infrastructure Damage', 'Other']
 const date = (v) => v ? new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(v)) : '—'
-const request = (config) => api({ ...config, headers: { ...config.headers, ...(localStorage.getItem('civicconnect-token') ? { Authorization: `Bearer ${localStorage.getItem('civicconnect-token')}` } : {}) } })
 function useAuth() { return useContext(Auth) }
 function AuthProvider({ children }) { const hasToken = Boolean(localStorage.getItem('civicconnect-token')); const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('civicconnect-user') || 'null')); const [ready, setReady] = useState(!hasToken); useEffect(() => { if (!hasToken) return; request({ url: '/auth/me' }).then(({ data }) => setUser(data.user)).catch(() => { localStorage.clear(); setUser(null) }).finally(() => setReady(true)) }, [hasToken]); const login = (data) => { localStorage.setItem('civicconnect-token', data.token); localStorage.setItem('civicconnect-user', JSON.stringify(data.user)); setUser(data.user) }; const logout = () => { localStorage.removeItem('civicconnect-token'); localStorage.removeItem('civicconnect-user'); setUser(null) }; return <Auth.Provider value={{ user, ready, login, logout }}>{children}</Auth.Provider> }
 function Protected({ children, roles }) { const { user, ready } = useAuth(); if (!ready) return <main className="loading">Loading CivicConnect…</main>; if (!user) return <Navigate to="/login" replace />; return roles && !roles.includes(user.role) ? <Navigate to="/dashboard" replace /> : children }

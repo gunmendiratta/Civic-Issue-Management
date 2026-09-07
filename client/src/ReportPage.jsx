@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import LocationPicker from './LocationPicker.jsx'
 import './report-location.css'
+import { request } from './api.js'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-const api = axios.create({ baseURL: API_URL })
 const categories = ['Pothole', 'Garbage / Waste', 'Broken Streetlight', 'Water Leakage', 'Road Damage', 'Drainage Issue', 'Fallen Tree', 'Traffic Signal Damage', 'Illegal Dumping', 'Public Infrastructure Damage', 'Other']
-const request = (config) => api({ ...config, headers: { ...config.headers, ...(localStorage.getItem('civicconnect-token') ? { Authorization: `Bearer ${localStorage.getItem('civicconnect-token')}` } : {}) } })
 
 export default function ReportPage() {
   const navigate = useNavigate()

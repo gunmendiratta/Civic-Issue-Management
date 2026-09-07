@@ -43,7 +43,7 @@ React + Vite client  →  Express API + MongoDB  →  FastAPI AI contract
 3. In another terminal, run `cd client && npm install && npm run dev`.
 4. Optionally run `cd ai-service && python -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/uvicorn app.main:app --reload --port 8000`.
 
-The frontend is at `http://localhost:5173`; the API health check is `http://localhost:3000/api/health`.
+For local development, the frontend uses the Vite proxy when `VITE_API_URL` is unset. For deployment, set `VITE_API_URL` to the public API URL, for example `https://your-api.example.com/api`, before building the frontend. The API health check is `/api/health` on that API host.
 
 ## Production note
 
