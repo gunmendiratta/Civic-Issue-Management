@@ -18,6 +18,8 @@ python -m venv .venv
 
 The current category and severity values are rules-based recommendations. If an image is supplied, its format and integrity are validated with Pillow, but no image confidence is reported until a real trained checkpoint is installed. Malformed or oversized images return a useful `4xx` response instead of crashing the service.
 
+When `GEMINI_API_KEY` is present in the AI service environment, `/predict` sends the structured complaint context and optional image to Gemini for multimodal analysis. Gemini output is constrained to the approved CivicConnect categories and departments, and the service falls back to the rules baseline when the key is missing, the provider times out, or the response is invalid. The key must remain server-side and must never be placed in `VITE_*` variables.
+
 ## Dataset and model status
 
 No dataset is bundled or fabricated in this repository. The required civic categories need to be validated against a public dataset's license, class coverage, image quality, and balance before training. Add any approved data under `data/raw`, `data/train`, `data/validation`, and `data/test`; these directories and generated checkpoints under `models/` must remain uncommitted.

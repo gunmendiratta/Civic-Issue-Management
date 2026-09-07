@@ -1,15 +1,15 @@
 import mongoose from 'mongoose'
 import { CATEGORIES, SEVERITIES, STATUSES } from '../config/constants.js'
 
-const evidenceSchema = new mongoose.Schema({ url: String, caption: { type: String, maxlength: 240 }, uploadedAt: { type: Date, default: Date.now } }, { _id: false })
+const evidenceSchema = new mongoose.Schema({ url: String, publicId: String, caption: { type: String, maxlength: 240 }, uploadedAt: { type: Date, default: Date.now } }, { _id: false })
 const locationSchema = new mongoose.Schema({
   type: { type: String, enum: ['Point'], default: 'Point' },
-  coordinates: { type: [Number], default: undefined },
+  coordinates: { type: [Number], required: true, validate: { validator: (value) => value.length === 2 && value.every(Number.isFinite), message: 'Issue coordinates must contain longitude and latitude.' } },
   address: { type: String, required: true, trim: true, maxlength: 300 },
   ward: { type: String, trim: true, maxlength: 100 },
   landmark: { type: String, trim: true, maxlength: 200 },
 }, { _id: false })
-const aiSchema = new mongoose.Schema({ status: { type: String, enum: ['baseline', 'available', 'unavailable'], default: 'baseline' }, category: { value: String, confidence: { type: Number, min: 0, max: 1 }, source: String }, severity: { value: String, score: { type: Number, min: 0, max: 1 }, source: String }, priorityScore: { type: Number, min: 0, max: 100 }, departmentRecommendation: String, duplicate: { isPotentialDuplicate: Boolean, similarityScore: { type: Number, min: 0, max: 1 }, matchedIssueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' } }, override: { category: String, severity: String, priorityScore: Number, department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' }, duplicateDecision: String, updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, updatedAt: Date }, modelName: String, modelVersion: String, explanation: String, processedAt: Date }, { _id: false })
+const aiSchema = new mongoose.Schema({ status: { type: String, enum: ['baseline', 'available', 'unavailable'], default: 'baseline' }, category: { value: String, confidence: { type: Number, min: 0, max: 1 }, source: String, consistent: Boolean }, severity: { value: String, score: { type: Number, min: 0, max: 1 }, source: String }, priorityScore: { type: Number, min: 0, max: 100 }, departmentRecommendation: String, communityEvidence: { nearbyComplaintCount: Number, uniqueReporters: Number, recentComplaintCount: Number, radiusMeters: Number, factorScores: mongoose.Schema.Types.Mixed }, duplicate: { isPotentialDuplicate: Boolean, similarityScore: { type: Number, min: 0, max: 1 }, matchedIssueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' } }, observed: [String], inferredRisks: [String], override: { category: String, severity: String, priorityScore: Number, department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' }, duplicateDecision: String, updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, updatedAt: Date }, modelName: String, modelVersion: String, explanation: String, processedAt: Date }, { _id: false })
 
 const schema = new mongoose.Schema({
   citizen: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },

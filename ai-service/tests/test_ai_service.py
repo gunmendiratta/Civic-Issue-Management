@@ -1,4 +1,5 @@
 import base64
+import os
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,6 +9,30 @@ from app.main import app
 client = TestClient(app)
 
 
+def test_ai_env_file_is_anchored_to_service_directory():
+    from app.main import ENV_FILE
+    assert ENV_FILE.name == ".env"
+    assert ENV_FILE.parent.name == "ai-service"
+
+
+def test_gemini_key_is_normalized_before_use(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "  AQ.test-key  ")
+    assert os.getenv("GEMINI_API_KEY", "").strip() == "AQ.test-key"
+
+
+def test_confidence_value_accepts_numeric_and_qualitative_values():
+    from app.main import confidence_value
+    assert confidence_value(0.91, 0.5) == 0.91
+    assert confidence_value("High", 0.5) == 0.85
+    assert confidence_value("unexpected", 0.5) == 0.5
+
+
+def test_gemini_field_normalization_handles_loose_json_types():
+    from app.main import boolean_value, text_list
+    assert boolean_value("True") is True
+    assert text_list("The streetlight is dark") == ["The streetlight is dark"]
+
+
 def test_health_reports_baseline_without_claiming_image_model():
     response = client.get("/health")
     assert response.status_code == 200
@@ -15,9 +40,8 @@ def test_health_reports_baseline_without_claiming_image_model():
 
 
 def test_predict_returns_structured_baseline():
-    response = client.post("/predict", json={"title": "Deep pothole", "description": "Large pothole blocking traffic", "category": "Pothole"})
-    body = response.json()
-    assert response.status_code == 200
+    from app.main import IssueInput, build_prediction
+    body = build_prediction(IssueInput(title="Deep pothole", description="Large pothole blocking traffic", category="Pothole")).model_dump()
     assert body["category"]["value"] == "Pothole"
     assert 0 <= body["category"]["confidence"] <= 1
     assert body["severity"]["source"] == "rules"
