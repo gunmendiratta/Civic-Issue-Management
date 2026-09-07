@@ -9,6 +9,7 @@ const locationSchema = new mongoose.Schema({
   ward: { type: String, trim: true, maxlength: 100 },
   landmark: { type: String, trim: true, maxlength: 200 },
 }, { _id: false })
+const aiSchema = new mongoose.Schema({ status: { type: String, enum: ['baseline', 'available', 'unavailable'], default: 'baseline' }, category: { value: String, confidence: { type: Number, min: 0, max: 1 }, source: String }, severity: { value: String, score: { type: Number, min: 0, max: 1 }, source: String }, priorityScore: { type: Number, min: 0, max: 100 }, departmentRecommendation: String, duplicate: { isPotentialDuplicate: Boolean, similarityScore: { type: Number, min: 0, max: 1 }, matchedIssueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' } }, override: { category: String, severity: String, priorityScore: Number, department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' }, duplicateDecision: String, updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, updatedAt: Date }, modelName: String, modelVersion: String, explanation: String, processedAt: Date }, { _id: false })
 
 const schema = new mongoose.Schema({
   citizen: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
@@ -16,6 +17,7 @@ const schema = new mongoose.Schema({
   description: { type: String, required: true, trim: true, maxlength: 3000 },
   category: { type: String, enum: CATEGORIES, required: true },
   aiResult: { category: String, categoryConfidence: Number, severity: String, severityScore: Number, explanation: String, analyzedAt: Date },
+  ai: { type: aiSchema, default: undefined },
   severity: { type: String, enum: SEVERITIES, default: 'Medium', index: true },
   priorityScore: { type: Number, min: 0, max: 100, default: 45, index: true },
   priorityLabel: { type: String, enum: ['Low', 'Medium', 'High', 'Critical'], default: 'Medium' },

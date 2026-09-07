@@ -4,5 +4,13 @@ server/.mongo-data/
 server/mongodb.log
 client/.env
 **/node_modules/
+**/.venv/
 **/dist/
+ai-service/data/raw/
+ai-service/data/train/
+ai-service/data/validation/
+ai-service/data/test/
+ai-service/models/*.pt
+ai-service/models/*.pth
+ai-service/models/*.onnx
 .DS_Store
