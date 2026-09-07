@@ -1,5 +1,7 @@
 server/.env
 server/uploads/
+server/.mongo-data/
+server/mongodb.log
 client/.env
 **/node_modules/
 **/dist/

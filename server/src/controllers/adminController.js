@@ -1,0 +1,13 @@
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
+import Department from '../models/Department.js'
+import User from '../models/User.js'
+
+const staffSchema = z.object({ name: z.string().trim().min(2).max(80), email: z.string().email(), password: z.string().min(8).max(128), role: z.enum(['admin', 'department', 'worker']), department: z.string().nullable().optional(), phone: z.string().trim().max(30).optional() })
+const publicUser = (user) => ({ id: user._id, name: user.name, email: user.email, role: user.role, department: user.department, phone: user.phone, active: user.active, createdAt: user.createdAt })
+
+export async function listDepartments(_req, res) { res.json(await Department.find({ active: true }).sort({ name: 1 })) }
+export async function listUsers(req, res) { const filter = req.query.role ? { role: req.query.role } : {}; const users = await User.find(filter).populate('department', 'name code').sort({ createdAt: -1 }); res.json(users.map(publicUser)) }
+export async function listAssignableStaff(req, res) { const filter = { role: { $in: ['worker', 'department'] }, active: true }; if (req.auth.role === 'department') filter.department = req.auth.department; const users = await User.find(filter).populate('department', 'name code').sort({ name: 1 }); res.json(users.map(publicUser)) }
+export async function createStaff(req, res) { const input = staffSchema.parse(req.body); const email = input.email.toLowerCase(); if (await User.exists({ email })) return res.status(409).json({ message: 'An account with this email already exists.' }); if (['worker', 'department'].includes(input.role) && !input.department) return res.status(422).json({ message: 'Choose a department for this staff account.' }); const user = await User.create({ ...input, email, passwordHash: await bcrypt.hash(input.password, 12), department: input.department || null }); await user.populate('department', 'name code'); res.status(201).json(publicUser(user)) }
+export async function updateUser(req, res) { const input = z.object({ active: z.boolean().optional(), role: z.enum(['citizen', 'admin', 'department', 'worker']).optional(), department: z.string().nullable().optional(), phone: z.string().trim().max(30).optional() }).parse(req.body); if (String(req.params.id) === req.auth.userId && input.active === false) return res.status(422).json({ message: 'You cannot disable your own administrator account.' }); const user = await User.findByIdAndUpdate(req.params.id, input, { new: true, runValidators: true }).populate('department', 'name code'); if (!user) return res.status(404).json({ message: 'User not found.' }); res.json(publicUser(user)) }

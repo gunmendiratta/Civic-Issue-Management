@@ -1,14 +1,15 @@
 """CivicConnect AI inference boundary; replace the transparent baseline with trained models."""
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
+from typing import Optional
 
 app = FastAPI(title="CivicConnect AI Service", version="0.1.0")
 class IssueInput(BaseModel):
     title: str = Field(min_length=3, max_length=120)
     description: str = Field(min_length=3, max_length=3000)
-    category: str | None = None
-    latitude: float | None = None
-    longitude: float | None = None
+    category: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 ROUTES = {"pothole":"Roads & Transport","road":"Roads & Transport","garbage":"Sanitation","waste":"Sanitation","dump":"Sanitation","streetlight":"Electrical","light":"Electrical","leak":"Water Supply","drain":"Water Supply","tree":"Parks & Public Spaces","traffic":"Traffic Management"}
 CATEGORY = {"pothole":"Pothole","garbage":"Garbage / Waste","waste":"Garbage / Waste","streetlight":"Broken Streetlight","leak":"Water Leakage","drain":"Drainage Issue","tree":"Fallen Tree","traffic":"Traffic Signal Damage"}
 @app.get("/health")
