@@ -10,7 +10,7 @@ python -m venv .venv
 
 ## Render deployment
 
-The repository includes `render.yaml` at the project root. It sets the Render service root directory to `ai-service`, uses the committed Python version in `runtime.txt` (`3.12.11`), installs `requirements.txt`, starts Uvicorn on Render's `$PORT`, and checks `/health`. If configuring Render manually, set **Root Directory** to `ai-service`, **Build Command** to `pip install -r requirements.txt`, and **Start Command** to `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+The repository includes `render.yaml` at the project root. It sets the Render service root directory to `ai-service`, pins `PYTHON_VERSION` to `3.12.11`, installs `requirements.txt`, starts Uvicorn on Render's `$PORT`, and checks `/health`. If configuring Render manually, set **Root Directory** to `ai-service`, **Environment Variable** `PYTHON_VERSION=3.12.11`, **Build Command** to `pip install -r requirements.txt`, and **Start Command** to `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 
 ## Current endpoints
 
